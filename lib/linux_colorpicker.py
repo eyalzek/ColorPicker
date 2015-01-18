@@ -1,12 +1,22 @@
+#!/usr/bin/env python
+
 from gi.repository import Gtk
-from gi.repository import Gdk
 import sys
+
+try:
+    Gdk = Gtk.gdk
+except AttributeError:
+    from gi.repository import Gdk
 
 color_sel = Gtk.ColorSelectionDialog("Sublime Color Picker")
 
 if len(sys.argv) > 1:
-    if Gdk.color_parse(sys.argv[1]):
-        color_sel.get_color_selection().set_current_color(Gdk.color_parse(sys.argv[1]))
+    current_color = Gdk.color_parse(sys.argv[1])
+    if current_color:
+        try:
+            color_sel.colorsel.set_current_color(current_color)
+        except AttributeError:  # newer version of GTK
+            color_sel.get_color_selection().set_current_color(current_color)
 
 if color_sel.run() == Gtk.ResponseType.OK:
     color = color_sel.get_color_selection().get_current_color()
